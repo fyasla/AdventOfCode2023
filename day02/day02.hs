@@ -9,7 +9,7 @@ import System.Console.Terminfo (Color (Blue))
 main = interact solution
 
 solution :: String -> String
-solution = show . sum . map process . lines
+solution = show . sum . map process' . lines
 
 getGameId :: String -> Int
 getGameId = read . last . words . head . splitOn ":"
@@ -32,3 +32,14 @@ checkGame = foldl (&&) True . checkGrabs . getGrabs
 
 process :: String -> Int
 process line = if checkGame line then getGameId line else 0
+
+process' :: String -> Int
+process' = minPower . getGrabs
+
+minColor :: [String] -> String -> Int
+minColor grabs col =  let parse = map words
+                          colorFilter = (\c -> filter (\xs -> last xs == c))
+                      in maximum $ map (read . head) ((colorFilter col) . parse $ grabs)
+
+minPower :: [String] -> Int
+minPower grabs = product $ map (minColor grabs) ["blue", "red", "green"]
